@@ -6,11 +6,14 @@ mkdir -p /run/mysqld
 chown -R mysql:mysql /run/mysqld
 chown -R mysql:mysql /var/lib/mysql
 
+MYSQL_PASSWORD=$(cat /run/secrets/db_password)
+MYSQL_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
+
 INIT_MARKER="/var/lib/mysql/.inception_initialized"
 
 if [ ! -f "${INIT_MARKER}" ]; then
 
-    # Initialize MySQL data directory if it doesn't exist
+    # Initialize MariaDB data directory if it doesn't exist
     if [ ! -d "/var/lib/mysql/mysql" ]; then
         mysql_install_db --user=mysql --datadir=/var/lib/mysql > /dev/null
     fi

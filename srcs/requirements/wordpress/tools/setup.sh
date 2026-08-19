@@ -3,20 +3,20 @@ set -e
 
 echo "Starting WordPress container..."
 
-DB_PASSWORD="${MYSQL_PASSWORD}"
+DB_PASSWORD=$(cat /run/secrets/db_password)
 
-ADMIN_USER="${WP_ADMIN_USER}"
-ADMIN_PASSWORD="${WP_ADMIN_PASSWORD}"
-ADMIN_EMAIL="${WP_ADMIN_EMAIL}"
+ADMIN_USER=$(grep '^wp_admin_user=' /run/secrets/credentials | cut -d= -f2)
+ADMIN_PASSWORD=$(grep '^wp_admin_password=' /run/secrets/credentials | cut -d= -f2)
+ADMIN_EMAIL=$(grep '^wp_admin_email=' /run/secrets/credentials | cut -d= -f2)
 
-EDITOR_USER="${WP_EDITOR_USER}"
-EDITOR_PASSWORD="${WP_EDITOR_PASSWORD}"
-EDITOR_EMAIL="${WP_EDITOR_EMAIL}"
+EDITOR_USER=$(grep '^wp_editor_user=' /run/secrets/credentials | cut -d= -f2)
+EDITOR_PASSWORD=$(grep '^wp_editor_password=' /run/secrets/credentials | cut -d= -f2)
+EDITOR_EMAIL=$(grep '^wp_editor_email=' /run/secrets/credentials | cut -d= -f2)
 
 echo "Waiting for MariaDB to be ready..."
 
 until mysqladmin ping -h mariadb -u"${MYSQL_USER}" -p"${DB_PASSWORD}" --silent; do
-    echo "Waiting for MariaDB..."
+    echo "Waiting for MariaDB..." ##need to check
     sleep 2
 done
 
@@ -57,7 +57,6 @@ else
     echo "WordPress already installed."
 fi
 
-# Create second user (non-admin) only if missing
 if ! wp user get "${EDITOR_USER}" --field=ID --allow-root > /dev/null 2>&1; then
     wp user create --allow-root \
         "${EDITOR_USER}" "${EDITOR_EMAIL}" \

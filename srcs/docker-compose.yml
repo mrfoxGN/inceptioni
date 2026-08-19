@@ -11,8 +11,10 @@ services:
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+    secrets:
+      - db_password
+      - db_root_password
 
     volumes:
       - db_data:/var/lib/mysql
@@ -33,19 +35,14 @@ services:
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       DOMAIN_NAME: ${DOMAIN_NAME}
-
-      WP_ADMIN_USER: ${WP_ADMIN_USER}
-      WP_ADMIN_PASSWORD: ${WP_ADMIN_PASSWORD}
-      WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
-
-      WP_EDITOR_USER: ${WP_EDITOR_USER}
-      WP_EDITOR_PASSWORD: ${WP_EDITOR_PASSWORD}
-      WP_EDITOR_EMAIL: ${WP_EDITOR_EMAIL}
 
     depends_on:
       - mariadb
+
+    secrets:
+      - db_password
+      - credentials
 
     volumes:
       - wp_data:/var/www/html
@@ -71,6 +68,17 @@ services:
 
     networks:
       - inception
+
+
+secrets:
+  db_password:
+    file: ../secrets/db_password.txt
+
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+
+  credentials:
+    file: ../secrets/credentials.txt
 
 
 volumes:
